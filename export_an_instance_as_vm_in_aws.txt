@@ -1,0 +1,16 @@
+1. Το Instance πρέπει να είναι stopped
+2. Πρέπει να έχω ένα S3 bucket με τα σωστά δικαιώματα.
+	ΠΡΟΣΟΧΗ: by default όταν φτιάχνω ένα S3 bucket είναι ενεργοποιημένο το Bucket owner enforced και έτσι τα ACLs είναι disabled
+	Πρέπει να πάω να ενεργοποιήσω το ACL's και να βάλω επιλογή Bucket Owner Preferred.
+	Επίσης θα πρέπει να φτιάξω και ένα Bucker policy. Για να ρο φτιάξω αυτό πρέπει να βρω το cononical ID 
+		για το region μου (eu-central-1 -> c4d8eabf8db69dbe46bfe0e517100c554f01200b104d59cd408e777ba442a322)
+		και να του προσθέσω δικαιώματα read/write στο s3 bucket που έφτιαξα.
+3.	Τέλος πάω και τρέχω από κάπου που έχω σετάρει το aws configure το εξής:
+	aws ec2 create-instance-export-task \
+	--instance-id i-0123456789abcdef0 \
+	--target-environment vmware \
+	--export-to-s3-task DiskImageFormat=VMDK,ContainerFormat=ova,S3Bucket=my-ec2-vm-export-2026,S3Prefix=exports/
+4. Θέλει αρκετή ώρα για να φτιαχτεί. 
+	Πας και τρέχει την εντολή: aws ec2 describe-export-tasks --export-task-ids export-i-83ff56000c93b556t 
+		για να βλέπεις τα tasks που τρέχουν για το συγκεκριμένο ec2 instance id. Θα είναι έτοιμο μόνο όταν γράψει completed
+5. Όταν τελειώσει πας στο S3 Bucktet και θα δεις ότι ο φάκελος exports έχει φτιαχτεί και μέσα έχει το .ova αρχείο το οποίο μπορείς να καταβάσεις. 
